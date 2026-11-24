@@ -1,3 +1,4 @@
+// make.fun news-image entry: 1024x1024 front page
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -126,7 +127,7 @@ export function verifyPng(bytes: Buffer): PngInfo {
   const height = bytes.readUInt32BE(20);
   if (width !== EXPECTED_WIDTH || height !== EXPECTED_HEIGHT) {
     throw new Error(
-      `PNG dimensions check failed: expected ${EXPECTED_WIDTH}x${EXPECTED_HEIGHT}, got ${width}x${height}`,
+      `PNG dimensions check failed: expected ${EXPECTED_WIDTH}x${EXPECTED_HEIGHT}, got width=${width}, height=${height}`,
     );
   }
 
