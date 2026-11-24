@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -149,7 +150,13 @@ function readSourceImage(sourcePath: string): Buffer {
 
 function resolveOutputDir(): string {
   const envDir = process.env.MAKEFUN_OUTPUT_DIR;
-  return envDir && envDir.length > 0 ? envDir : DEFAULT_OUTPUT_DIR;
+  if (envDir === undefined) {
+    return DEFAULT_OUTPUT_DIR;
+  }
+  if (envDir.length === 0) {
+    throw new Error("MAKEFUN_OUTPUT_DIR environment variable must not be empty");
+  }
+  return envDir;
 }
 
 function writeOutputImage(outputDir: string, bytes: Buffer): string {
@@ -170,6 +177,10 @@ export function main(): void {
   const outputDir = resolveOutputDir();
   writeOutputImage(outputDir, bytes);
   console.log(`${IMAGE_FILENAME}: ${info.byteLength} bytes, ${info.width}x${info.height}`);
+  if (process.env.MAKEFUN_VERBOSE === "1") {
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    console.log(`sha256: ${sha256}`);
+  }
 }
 
 function isDirectExecution(): boolean {
